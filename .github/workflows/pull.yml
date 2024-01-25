@@ -23,3 +23,6 @@ jobs:
   target-determination:
     name: target-determination
     uses: ./.github/workflows/target_determination.yml
+    permissions:
+      id-token: write
+      contents: read

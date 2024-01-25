@@ -3,9 +3,6 @@ name: target-determination
 on:
   workflow_call:
 
-permissions:
-  id-token: write
-
 jobs:
   target-determination:
     # Don't run on forked repos
