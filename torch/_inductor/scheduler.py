@@ -2030,6 +2030,25 @@ class Scheduler:
             if node1_names & self.name_to_fused_node[name].ancestors:
                 why("intermediate nodes between node1 & node2")
                 return False
+
+        # similar to can_inplace, if we are going to fuse a write subsequent to a read
+        # require that the indexing and size is the same
+        for write in node2.read_writes.writes:
+            for read in node1.read_writes.reads:
+                if write.name != self.mutation_renames.get(read.name, read.name):
+                    continue
+
+                # bail on StarDep
+                if not isinstance(read, dependencies.MemoryDep) and not isinstance(
+                    write, dependencies.MemoryDep
+                ):
+                    why("fusing write into read without explicit memory dependency")
+                    return False
+
+                if read.index != write.index or read.size != write.size:
+                    why("fusing a write into a read with different indexing formula")
+                    return False
+
         return True
 
     def score_fusion(self, node1: BaseSchedulerNode, node2: BaseSchedulerNode):
