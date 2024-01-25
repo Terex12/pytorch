@@ -1,6 +1,7 @@
 import traceback
 
 from dataclasses import dataclass
+from enum import auto, Enum
 from typing import Any, cast, List, Optional, Tuple
 
 import torch
@@ -54,6 +55,13 @@ class HSDPMeshInfo(FSDPMeshInfo, DDPMeshInfo):
     def __post_init__(self):
         super(FSDPMeshInfo, self).__post_init__()
         super(DDPMeshInfo, self).__post_init__()
+
+
+class TrainingState(Enum):
+    FORWARD = auto()
+    PRE_BACKWARD = auto()
+    POST_BACKWARD = auto()
+    IDLE = auto()
 
 
 def _raise_assert_with_print(*args: Any, **kwargs: Any):
