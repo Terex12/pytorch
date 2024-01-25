@@ -26,3 +26,39 @@ jobs:
     permissions:
       id-token: write
       contents: read
+
+  test-read-td-results-non-s3:
+    needs: target-determination
+    name: test-read-td-results
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PyTorch
+        uses: pytorch/pytorch/.github/actions/checkout-pytorch@main
+
+      - name: Download from GHA
+        uses: actions/download-artifact@v3
+        with:
+          use-gha: true
+          name: td_results.json
+
+      - name: echo
+        run: echo td_results.json
+
+  test-read-td-results-s3:
+    needs: target-determination
+    name: test-read-td-results
+    runs-on: linux.2xlarge
+    steps:
+      - name: Checkout PyTorch
+        uses: pytorch/pytorch/.github/actions/checkout-pytorch@main
+
+      - name: Setup Linux
+        uses: ./.github/actions/setup-linux
+
+      - name: Download from S3
+        uses: actions/download-artifact@v3
+        with:
+          name: td_results.json
+
+      - name: echo
+        run: echo td_results.json
