@@ -22,4 +22,4 @@ permissions: read-all
 jobs:
   target-determination:
     name: target-determination
-    uses: ./.github/workflows/target-determination.yml
+    uses: ./.github/workflows/target_determination.yml
