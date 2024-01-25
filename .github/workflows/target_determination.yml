@@ -19,11 +19,6 @@ jobs:
       - name: Setup Linux
         uses: ./.github/actions/setup-linux
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-
       - name: Download pytest cache
         uses: ./.github/actions/pytest-cache-download
         continue-on-error: true
@@ -33,4 +28,4 @@ jobs:
 
       - name: Do TD
         run: |
-          python tools/testing/do_target_determination_for_s3.py
+          python3 tools/testing/do_target_determination_for_s3.py
