@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING
+from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING, Union
 
 from ... import ir
 from ...autotune_process import CUDABenchmarkRequest
@@ -183,6 +183,21 @@ class CUDATemplateKernel(CUDAKernel):
             return "void"
         return DTYPE_TO_CPP.get(node.get_layout().dtype)
 
+    def cutlass_dtype(self, node: IRNode, default_dtype="void") -> Optional[str]:
+        if node is None:
+            return default_dtype
+        from torch._inductor.codegen.cuda.cuda_template import CUTLASSTemplate
+
+        return CUTLASSTemplate._DTYPE_TO_CUTLASS[node.get_layout().dtype]
+
+    def max_valid_index(self, node: IRNode, default=-1):
+        if node is None:
+            return default
+        max_valid_offset = 0
+        for i in range(len(node.get_size())):
+            max_valid_offset += (node.get_size()[i] - 1) * node.get_stride()[i]
+        return max_valid_offset
+
     def offset(self, node: IRNode) -> str:
         """
         Generates code which represents offset of a given node.
@@ -228,7 +243,7 @@ class CUDATemplateKernel(CUDAKernel):
             end_index = start_index
         end_index = _normalize_idx(end_index, len(node.get_size()))
 
-        sizes = node.get_size()[start_index : end_index + 1]
+        sizes = node.get_size()[start_index : end_index + 1]  # type: ignore[union-attr]
         if len(sizes) == 0:
             return str(default_value)
 
@@ -300,7 +315,7 @@ class CUDATemplateCaller(ChoiceCaller):
         make_kernel_render: Callable[[CUDATemplateBuffer, Optional[List[IRNode]]], str],
         bmreq: CUDABenchmarkRequest,
         template: "CUDATemplate",  # type: ignore[name-defined]
-        info_kwargs: Optional[dict[str, PrimitiveInfoType]],  # type: ignore[type-arg]
+        info_kwargs: Optional[Dict[str, Union[PrimitiveInfoType, List[PrimitiveInfoType]]]],  # type: ignore[type-arg]
     ):
         super().__init__(name, input_nodes, layout)
         self.category = category
@@ -332,10 +347,17 @@ class CUDATemplateCaller(ChoiceCaller):
             ]
         )
 
-    def info_dict(self) -> Dict[str, PrimitiveInfoType]:
+    def info_dict(self) -> Dict[str, Union[PrimitiveInfoType, List[PrimitiveInfoType]]]:
         """Information returned here is logged to the autotune log file when that is enabled."""
         if self.info_kwargs is not None and "op" in self.info_kwargs:
             op: Any = self.info_kwargs["op"]
+            epilogue_node_names: List[str] = [
+                getattr(en, "name", "no_name")
+                for en in self.info_kwargs.get("epilogue_nodes", [])  # type: ignore[union-attr]
+            ]
+            epilogue_node_strs: List[str] = [
+                str(en) for en in self.info_kwargs.get("epilogue_nodes", [])  # type: ignore[union-attr]
+            ]
             return {
                 "backend": "CUDA",
                 "op_type": type(op).__name__,
@@ -344,6 +366,8 @@ class CUDATemplateCaller(ChoiceCaller):
                 "kernel_schedule": str(op.kernel_schedule),
                 "element_accumulator": str(op.accumulator_type()),
                 "op_name": str(op.procedural_name()),
+                "epilogue_node_names": epilogue_node_names,  # type: ignore[dict-item]
+                "epilogue_node_strs": epilogue_node_strs,  # type: ignore[dict-item]
                 "instruction_shape": str(
                     op.tile_description.math_instruction.instruction_shape
                 ),
