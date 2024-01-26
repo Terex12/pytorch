@@ -57,8 +57,11 @@ jobs:
       - name: Download from S3
         uses: ./.github/actions/download-build-artifacts
         with:
-          name: td_results.json
-          unzip: false
+          name: cat_td_results
+          unzip: 'false'
 
       - name: echo
-        run: cat td_results.json
+        run: |
+          ls
+          cat cat_td_results/td_results.json
+          cat td_results.json
