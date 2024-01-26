@@ -308,6 +308,11 @@ inline T* get_data_ptr_wrapper(const MiniArrayRef<T>& arr) {
   return arr.data();
 }
 
+template <typename T>
+inline T* get_data_ptr_wrapper(T& scalar) {
+  return &scalar;
+}
+
 inline AtenTensorHandle unwrap_raii_handle_if_needed(
     const RAIIAtenTensorHandle& handle) {
   return handle.get();
