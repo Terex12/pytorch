@@ -29,8 +29,8 @@ jobs:
 
   test-read-td-results-non-s3:
     needs: target-determination
-    name: test-read-td-results
-    runs-on: ubuntu-latest-non-s3
+    name: test-read-td-results-non-s3
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout PyTorch
         uses: pytorch/pytorch/.github/actions/checkout-pytorch@main

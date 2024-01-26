@@ -9,6 +9,9 @@ inputs:
   use-gha:
     description: If set to any value, use GHA to download the artifact. Otherwise use s3.
     required: false
+  unzip:
+    description: If set to any value, unzip the downloaded artifact.
+    required: false
 
 runs:
   using: composite
@@ -26,6 +29,7 @@ runs:
         name: ${{ inputs.name }}
 
     - name: Unzip artifacts
+      if: inputs.unzip
       shell: bash
       run: unzip -o artifacts.zip
 
