@@ -44,7 +44,7 @@ from tools.stats.import_test_stats import (
     TEST_CLASS_TIMES_FILE,
     TEST_TIMES_FILE,
 )
-from tools.stats.upload_metrics import add_global_metric, emit_metric
+from tools.stats.upload_metrics import add_global_metric
 from tools.testing.discover_tests import (
     CPP_TEST_PATH,
     CPP_TEST_PREFIX,
@@ -52,11 +52,7 @@ from tools.testing.discover_tests import (
     parse_test_module,
     TESTS,
 )
-from tools.testing.target_determination.determinator import (
-    AggregatedHeuristics,
-    get_prediction_confidences,
-    get_test_prioritizations,
-)
+from tools.testing.do_target_determination_for_s3 import import_results
 
 from tools.testing.test_run import TestRun
 from tools.testing.test_selections import (
@@ -1586,26 +1582,17 @@ def main():
     test_directory = str(REPO_ROOT / "test")
     selected_tests = get_selected_tests(options)
 
+    test_prioritizations = import_results()
+    test_prioritizations.filter_tests(selected_tests)
+
     os.makedirs(REPO_ROOT / "test" / "test-reports", exist_ok=True)
 
     if options.coverage and not PYTORCH_COLLECT_COVERAGE:
         shell(["coverage", "erase"])
 
-    aggregated_heuristics: AggregatedHeuristics = AggregatedHeuristics(
-        unranked_tests=selected_tests
-    )
-
-    with open(
-        REPO_ROOT / "test" / "test-reports" / "td_heuristic_rankings.log", "w"
-    ) as f:
-        if IS_CI:
-            # downloading test cases configuration to local environment
-            get_test_case_configs(dirpath=test_directory)
-            aggregated_heuristics = get_test_prioritizations(selected_tests, file=f)
-
-        test_prioritizations = aggregated_heuristics.get_aggregated_priorities()
-
-        f.write(test_prioritizations.get_info_str())
+    if IS_CI:
+        # downloading test cases configuration to local environment
+        get_test_case_configs(dirpath=test_directory)
 
     test_file_times_dict = load_test_file_times()
     test_class_times_dict = load_test_class_times()
@@ -1718,22 +1705,22 @@ def main():
 
         if IS_CI:
             num_tests = len(selected_tests)
-            for test, _ in all_failures:
-                test_stats = aggregated_heuristics.get_test_stats(test)
-                test_stats["num_total_tests"] = num_tests
+            # for test, _ in all_failures:
+            #     test_stats = aggregated_heuristics.get_test_stats(test)
+            #     test_stats["num_total_tests"] = num_tests
 
-                print_to_stderr("Emiting td_test_failure_stats")
-                emit_metric(
-                    "td_test_failure_stats",
-                    {
-                        **test_stats,
-                        "confidence_ratings": get_prediction_confidences(
-                            selected_tests
-                        ),
-                        "failure": str(test),
-                        "tests": selected_tests,
-                    },
-                )
+            #     print_to_stderr("Emiting td_test_failure_stats")
+            #     emit_metric(
+            #         "td_test_failure_stats",
+            #         {
+            #             # **test_stats,
+            #             "confidence_ratings": get_prediction_confidences(
+            #                 selected_tests
+            #             ),
+            #             "failure": str(test),
+            #             "tests": selected_tests,
+            #         },
+            #     )
 
     if len(all_failures):
         for _, err in all_failures:

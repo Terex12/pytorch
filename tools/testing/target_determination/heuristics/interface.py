@@ -335,6 +335,50 @@ class TestPrioritizations:
             METRIC_ORDER_OVERALL: self._get_test_order(test_run),
         }
 
+    def to_json(self) -> Dict[str, Any]:
+        """
+        Returns a JSON dict that describes this TestPrioritizations object.
+        """
+        json_dict: Dict[str, Any] = {}
+        for relevance_group, tests in self._traverse_priorities():
+            json_dict[relevance_group.name.lower()] = []
+            for test_run in tests:
+                json_dict[relevance_group.name.lower()].append(test_run.to_json())
+
+        json_dict["original_tests"] = list(self._original_tests)
+
+        return json_dict
+
+    @staticmethod
+    def from_json(json_dict: Dict[str, Any]) -> "TestPrioritizations":
+        """
+        Returns a TestPrioritizations object from a JSON dict.
+        """
+        test_prioritizations = TestPrioritizations(
+            tests_being_ranked=[],
+            high_relevance=[],
+            probable_relevance=[],
+            unranked_relevance=[],
+            unlikely_relevance=[],
+            no_relevance=[],
+        )
+
+        for relevance_group in Relevance:
+            testruns = [
+                TestRun.from_json(testrun_json)
+                for testrun_json in json_dict[relevance_group.name.lower()]
+            ]
+            test_prioritizations._test_priorities[relevance_group.value] = testruns
+
+        return test_prioritizations
+
+    def filter_tests(self, tests: List[str]) -> None:
+        for relevance_group, testruns in self._traverse_priorities():
+            new_testruns = [
+                testrun for testrun in testruns if testrun.test_file in tests
+            ]
+            self._test_priorities[relevance_group.value] = new_testruns
+
 
 class AggregatedHeuristics:
     """

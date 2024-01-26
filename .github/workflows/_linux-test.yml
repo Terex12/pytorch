@@ -117,11 +117,8 @@ jobs:
         with:
           name: ${{ inputs.build-environment }}
 
-      - name: Download build artifacts
-        uses: ./.github/actions/download-build-artifacts
-        with:
-          name: cat_td_results
-          unzip: ""
+      - name: Download TD artifacts
+        uses: ./.github/actions/download-td-artifacts
 
       - name: Parse ref
         id: parse-ref
