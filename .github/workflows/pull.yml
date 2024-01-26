@@ -41,7 +41,7 @@ jobs:
           name: td_results.json
 
       - name: echo
-        run: echo td_results.json
+        run: cat td_results.json
 
   test-read-td-results-s3:
     needs: target-determination
@@ -61,4 +61,4 @@ jobs:
           unzip: false
 
       - name: echo
-        run: echo td_results.json
+        run: cat td_results.json
