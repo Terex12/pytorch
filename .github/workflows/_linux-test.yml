@@ -117,6 +117,12 @@ jobs:
         with:
           name: ${{ inputs.build-environment }}
 
+      - name: Download build artifacts
+        uses: ./.github/actions/download-build-artifacts
+        with:
+          name: cat_td_results
+          unzip: ""
+
       - name: Parse ref
         id: parse-ref
         run: .github/scripts/parse_ref.py

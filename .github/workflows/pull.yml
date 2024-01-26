@@ -21,46 +21,37 @@ permissions: read-all
 
 jobs:
   target-determination:
-    name: target-determination
+    name: before-test
     uses: ./.github/workflows/target_determination.yml
     permissions:
       id-token: write
       contents: read
 
-  test-read-td-results-non-s3:
-    needs: target-determination
-    name: test-read-td-results-non-s3
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout PyTorch
-        uses: pytorch/pytorch/.github/actions/checkout-pytorch@main
+  linux-jammy-py3_8-gcc11-build:
+    name: linux-jammy-py3.8-gcc11
+    uses: ./.github/workflows/_linux-build.yml
+    with:
+      build-environment: linux-jammy-py3.8-gcc11
+      docker-image-name: pytorch-linux-jammy-py3.8-gcc11
+      test-matrix: |
+        { include: [
+          { config: "default", shard: 1, num_shards: 3, runner: "linux.2xlarge" },
+          { config: "default", shard: 2, num_shards: 3, runner: "linux.2xlarge" },
+          { config: "default", shard: 3, num_shards: 3, runner: "linux.2xlarge" },
+          { config: "docs_test", shard: 1, num_shards: 1,  runner: "linux.2xlarge" },
+          { config: "jit_legacy", shard: 1, num_shards: 1, runner: "linux.2xlarge" },
+          { config: "backwards_compat", shard: 1, num_shards: 1, runner: "linux.2xlarge" },
+          { config: "distributed", shard: 1, num_shards: 2, runner: "linux.2xlarge" },
+          { config: "distributed", shard: 2, num_shards: 2, runner: "linux.2xlarge" },
+        ]}
 
-      - name: Download from GHA
-        uses: actions/download-artifact@v3
-        with:
-          name: td_results.json
-
-      - name: echo
-        run: cat td_results.json
-
-  test-read-td-results-s3:
-    needs: target-determination
-    name: test-read-td-results-s3
-    runs-on: linux.2xlarge
-    steps:
-      - name: Checkout PyTorch
-        uses: pytorch/pytorch/.github/actions/checkout-pytorch@main
-
-      - name: Setup Linux
-        uses: ./.github/actions/setup-linux
-
-      - name: Download from S3
-        uses: ./.github/actions/download-build-artifacts
-        with:
-          name: cat_td_results
-          unzip: ""
-
-      - name: echo
-        run: |
-          ls
-          cat td_results.json
+  linux-jammy-py3_8-gcc11-test:
+    name: linux-jammy-py3.8-gcc11
+    uses: ./.github/workflows/_linux-test.yml
+    needs:
+      - linux-jammy-py3_8-gcc11-build
+      - target-determination
+    with:
+      build-environment: linux-jammy-py3.8-gcc11
+      docker-image: ${{ needs.linux-jammy-py3_8-gcc11-build.outputs.docker-image }}
+      test-matrix: ${{ needs.linux-jammy-py3_8-gcc11-build.outputs.test-matrix }}

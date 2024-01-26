@@ -10,10 +10,9 @@ inputs:
     description: If set to any value, use GHA to download the artifact. Otherwise use s3.
     required: false
   unzip:
-    description: If set to any value, unzip the downloaded artifact.
+    description: If set to "" (empty string), does not unzip artifacts.zip
     required: false
-    type: boolean
-    default: true
+    default: "non empty string"
 
 runs:
   using: composite
