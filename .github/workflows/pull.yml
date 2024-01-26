@@ -58,6 +58,7 @@ jobs:
         uses: ./.github/actions/download-build-artifacts
         with:
           name: td_results.json
+          unzip: false
 
       - name: echo
         run: echo td_results.json

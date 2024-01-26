@@ -12,6 +12,8 @@ inputs:
   unzip:
     description: If set to any value, unzip the downloaded artifact.
     required: false
+    type: boolean
+    default: true
 
 runs:
   using: composite
