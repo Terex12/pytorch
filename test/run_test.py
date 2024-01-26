@@ -1583,7 +1583,7 @@ def main():
     selected_tests = get_selected_tests(options)
 
     test_prioritizations = import_results()
-    test_prioritizations.filter_tests(selected_tests)
+    test_prioritizations.amend_tests(selected_tests)
 
     os.makedirs(REPO_ROOT / "test" / "test-reports", exist_ok=True)
 

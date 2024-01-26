@@ -372,12 +372,24 @@ class TestPrioritizations:
 
         return test_prioritizations
 
-    def filter_tests(self, tests: List[str]) -> None:
+    def amend_tests(self, tests: List[str]) -> None:
+        """
+        Removes tests that are not in the given list from the
+        TestPrioritizations.  Adds tests that are in the list but not in the
+        TestPrioritizations.
+        """
         for relevance_group, testruns in self._traverse_priorities():
             new_testruns = [
                 testrun for testrun in testruns if testrun.test_file in tests
             ]
             self._test_priorities[relevance_group.value] = new_testruns
+
+        for test in tests:
+            if test not in self._original_tests:
+                self._test_priorities[Relevance.UNRANKED.value].append(TestRun(test))
+
+        self._original_tests = frozenset(tests)
+        self.validate_test_priorities()
 
 
 class AggregatedHeuristics:
