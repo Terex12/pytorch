@@ -63,5 +63,4 @@ jobs:
       - name: echo
         run: |
           ls
-          cat cat_td_results/td_results.json
           cat td_results.json
