@@ -58,7 +58,7 @@ jobs:
         uses: ./.github/actions/download-build-artifacts
         with:
           name: cat_td_results
-          unzip: false
+          unzip: ""
 
       - name: echo
         run: |
