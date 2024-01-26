@@ -35,7 +35,7 @@ jobs:
         uses: seemethere/upload-artifact-s3@v5
         if: steps.td.outcome != 'skipped'
         with:
-          name: cat_td_results
+          name: td_results
           retention-days: 14
           if-no-files-found: error
           path: td_results.json
