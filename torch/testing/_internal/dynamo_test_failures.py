@@ -2181,7 +2181,6 @@ dynamo_expected_failures = {
     "TestAutograd.test_backward_with_inputs",  # test_autograd
     "TestAutograd.test_setitem",  # test_autograd
     "TestAutogradDeviceTypeCPU.test_inplace_on_view_python_cpu",  # test_autograd
-    "TestAutogradForwardMode.test_make_dual_inference_tensor_in_inference_mode",  # test_autograd
     "TestAutogradInferenceMode.test_inference_mode_inf_tensor_in_normal_mode_inplace_op",  # test_autograd
     "TestAutograd.test_custom_function_save_for_forward",  # test_autograd
     "TestAutograd.test_sparse_mm_backward",  # test_autograd
@@ -2202,7 +2201,6 @@ dynamo_expected_failures = {
     "TestNestedCheckpoint.test_nested_checkpoint_kwargs_early_stop_False",  # test_autograd
     "TestAutograd.test_checkpointing_non_reentrant_autocast_cpu",  # test_autograd
     "TestAutograd.test_named_tensor_for_complex_views",  # test_autograd
-    "TestAutogradInferenceMode.test_inference_mode_existing_autograd_session",  # test_autograd
     "TestAutograd.test_set_grad_generator_functions_recursive",  # test_autograd
     "TestAutograd.test_increment_version",  # test_autograd
     "TestAutograd.test_record_function_callbacks",  # test_autograd
