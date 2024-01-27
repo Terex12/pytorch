@@ -85,6 +85,8 @@ def log_compilation_event(metrics):
 def print_graph(graph, msg: str):
     pass
 
+def set_pytorch_distributed_envs_from_justknobs():
+    pass
 
 TEST_MASTER_ADDR = "127.0.0.1"
 TEST_MASTER_PORT = 29500
