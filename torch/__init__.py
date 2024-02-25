@@ -1881,6 +1881,7 @@ def compile(model: Optional[Callable] = None, *,
     if mode is None and options is None:
         mode = "default"
     if backend == "inductor":
+        print("[torch/__init__.py] compile with inductor backend")
         backend = _TorchCompileInductorWrapper(mode, options, dynamic)
     else:
         backend = _TorchCompileWrapper(backend, mode, options, dynamic)

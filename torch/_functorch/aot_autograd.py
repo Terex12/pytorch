@@ -876,6 +876,7 @@ def aot_module_simplified(
     )
 
     with compiled_autograd.disable():
+        print("[torch/_functorch/aot_autograd.py] 870: create_aot_dispatcher_function")
         compiled_fn = create_aot_dispatcher_function(
             functional_call,
             full_args,

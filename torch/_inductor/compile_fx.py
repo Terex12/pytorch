@@ -1091,7 +1091,6 @@ def fw_compiler_freezing(
 
     return wrapper
 
-
 @_use_lazy_graph_module(dynamo_config.use_lazy_graph_module)
 def compile_fx(
     model_: torch.fx.GraphModule,
@@ -1101,6 +1100,9 @@ def compile_fx(
     decompositions: Optional[Dict[OpOverload, Callable[..., Any]]] = None,
 ):
     """Main entrypoint to a compile given FX graph"""
+    print("[torch/_inductor/compile_fx.py] 1178 : compile_fx ", model_, type(model_)) 
+    #handle_traced_graph(model_)
+
     if config_patches:
         with config.patch(config_patches):
             return compile_fx(
@@ -1205,6 +1207,9 @@ def compile_fx(
         num_rng_seed_offset_inputs = 2 if functorch_config.functionalize_rng_ops else 0
         fixed = len(example_inputs) - num_example_inputs - num_rng_seed_offset_inputs
         user_visible_outputs = set()
+        
+        print("[torch/_inductor/compile_fx.py] 1286 : fw_compiler_base ", 1/0)
+
 
         if config.keep_output_stride:
             *_, model_outputs_node = model.graph.nodes

@@ -1072,6 +1072,8 @@ class OutputGraph(Checkpointable[OutputGraphState]):
         # free a bit of memory
         self.real_value_cache.clear()
 
+        print("[torch/_dynamo/output_graph.py] 1075:", type(self.graph))
+
         gm = _make_graph_module(root, self.graph)
         for register_finalizer in self.register_finalizer_fns:
             register_finalizer(gm)

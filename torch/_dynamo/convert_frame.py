@@ -591,6 +591,8 @@ def _compile(
         output_codes.add(out_code)
 
         assert output is not None
+        print("[torch/_dynamo/convert_frame.py] 537: output", type(output), output.guards, flush=True)
+
 
         # Tests for new code objects.
         # The rationale for these tests can be found in torch/csrc/dynamo/eval_frame.c
